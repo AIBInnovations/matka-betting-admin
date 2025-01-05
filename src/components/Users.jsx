@@ -1,80 +1,131 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import UserModal from './UserModal'; // Ensure the path is correct based on your project structure
 
 function Users() {
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [usersData, setUsersData] = useState([
-        { id: 1, name: "John Doe", walletBalance: "$1,000", betsPlaced: 5, phone: "123-456-7890", email: "john.doe@example.com", address: "1234 Elm Street, Somewhere, NY 10001", dateOfJoining: "2020-01-01" },
-        { id: 2, name: "Jane Smith", walletBalance: "$2,500", betsPlaced: 10, phone: "987-654-3210", email: "jane.smith@example.com", address: "5678 Oak Street, Anytown, CA 90210", dateOfJoining: "2020-05-15" },
-        { id: 3, name: "Alice Johnson", walletBalance: "$3,200", betsPlaced: 15, phone: "555-2368", email: "alice.johnson@example.com", address: "1357 Pine Street, Everywhere, TX 75001", dateOfJoining: "2021-03-23" },
-        { id: 4, name: "Bob Brown", walletBalance: "$4,600", betsPlaced: 20, phone: "321-654-0987", email: "bob.brown@example.com", address: "2468 Maple Street, Nowhere, FL 33001", dateOfJoining: "2021-07-30" },
-        { id: 5, name: "Carol Taylor", walletBalance: "$5,750", betsPlaced: 25, phone: "111-222-3333", email: "carol.taylor@example.com", address: "9876 Spruce Street, ThisTown, VA 22001", dateOfJoining: "2022-02-12" }
-    ]);
-    const [isAddingUser, setIsAddingUser] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [usersData, setUsersData] = useState([]);
+  const [isAddingUser, setIsAddingUser] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    const handleUserClick = (user) => {
-        setSelectedUser(user);
+  // Fetch users from the backend
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const token = localStorage.getItem('token'); // Retrieve token from localStorage
+        const { data } = await axios.get('https://only-backend-je4j.onrender.com/api/admin/users', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUsersData(data.users);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to fetch users.');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleCloseModal = () => {
-        setSelectedUser(null);
-        setIsAddingUser(false);
-    };
+    fetchUsers();
+  }, []);
 
-    const handleSaveUser = (user) => {
-        if (isAddingUser) {
-            setUsersData([...usersData, { ...user, id: usersData.length + 1 }]);
-        } else {
-            setUsersData(usersData.map(u => (u.id === user.id ? user : u)));
-        }
-    };
+  // Handle user row click
+  const handleUserClick = (user) => {
+    setSelectedUser(user);
+  };
 
-    return (
-        <div className="p-8 bg-gray-50 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">User Management</h2>
-            <div className="overflow-x-auto rounded-lg shadow">
-                <table className="w-full text-sm text-left text-gray-600">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="px-6 py-3 font-medium">Name</th>
-                            <th className="px-6 py-3 font-medium">Phone Number</th>
-                            <th className="px-6 py-3 font-medium">Wallet Balance</th>
-                            <th className="px-6 py-3 font-medium">Bets Placed</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {usersData.map(user => (
-                            <tr
-                                key={user.id}
-                                className="hover:bg-gray-100 cursor-pointer"
-                                onClick={() => handleUserClick(user)}
-                            >
-                                <td className="px-6 py-4">{user.name}</td>
-                                <td className="px-6 py-4">{user.phone}</td>
-                                <td className="px-6 py-4">{user.walletBalance}</td>
-                                <td className="px-6 py-4">{user.betsPlaced}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            <div className="flex justify-end mt-6">
-                <button
-                    onClick={() => setIsAddingUser(true)}
-                    className="bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow transform transition-transform hover:scale-105"
+  // Handle modal close
+  const handleCloseModal = () => {
+    setSelectedUser(null);
+    setIsAddingUser(false);
+  };
+
+  // Handle save user (add or update)
+  const handleSaveUser = async (user) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (isAddingUser) {
+        // Add new user
+        const { data } = await axios.post(
+          'http://localhost:5000/api/admin/users',
+          user,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setUsersData([...usersData, data.user]);
+      } else {
+        // Update existing user
+        const { data } = await axios.put(
+          `http://localhost:5000/api/admin/users/${user.id}`,
+          user,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setUsersData(usersData.map((u) => (u._id === user._id ? data.user : u)));
+      }
+      handleCloseModal();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save user.');
+    }
+  };
+
+  return (
+    <div className="p-8 bg-gray-50 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-semibold mb-4 text-gray-800">User Management</h2>
+
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      {loading ? (
+        <p>Loading users...</p>
+      ) : (
+        <div className="overflow-x-auto rounded-lg shadow">
+          <table className="w-full text-sm text-left text-gray-600">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-6 py-3 font-medium">Name</th>
+                <th className="px-6 py-3 font-medium">Phone Number</th>
+                <th className="px-6 py-3 font-medium">Wallet Balance</th>
+                <th className="px-6 py-3 font-medium">Bets Placed</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {usersData.map((user) => (
+                <tr
+                  key={user._id}
+                  className="hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleUserClick(user)}
                 >
-                    Add User
-                </button>
-            </div>
-            {(selectedUser || isAddingUser) && (
-                <UserModal
-                    user={isAddingUser ? {} : selectedUser}
-                    onClose={handleCloseModal}
-                    onSave={handleSaveUser}
-                />
-            )}
+                  <td className="px-6 py-4">{user.name}</td>
+                  <td className="px-6 py-4">{user.phoneNumber}</td>
+                  <td className="px-6 py-4">{user.walletBalance}</td>
+                  <td className="px-6 py-4">{user.bets?.length || 0}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-    );
+      )}
+
+      <div className="flex justify-end mt-6">
+        <button
+          onClick={() => setIsAddingUser(true)}
+          className="bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow transform transition-transform hover:scale-105"
+        >
+          Add User
+        </button>
+      </div>
+
+      {(selectedUser || isAddingUser) && (
+        <UserModal
+          user={isAddingUser ? {} : selectedUser}
+          onClose={handleCloseModal}
+          onSave={handleSaveUser}
+        />
+      )}
+    </div>
+  );
 }
 
 export default Users;
