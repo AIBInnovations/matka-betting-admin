@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 function MarketFormModal({ onClose, onSave }) {
     const [market, setMarket] = useState({
         name: '',
-        openTime: '',  // These will now hold time in 'HH:mm' format
+        openTime: '',
         closeTime: '',
-        type: '',
         isBettingOpen: false
     });
 
@@ -19,8 +18,26 @@ function MarketFormModal({ onClose, onSave }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSave(market);
+        // Generate a random Market ID
+        const marketId = `MKT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        // Prepare the payload, potentially convert time to preferred format here if necessary
+        const payload = {
+            ...market,
+            marketId,
+            openTime: formatTime(market.openTime),
+            closeTime: formatTime(market.closeTime)
+        };
+        onSave(payload);
         onClose(); // Close modal after saving
+    };
+
+    // Function to format the time input to 'h:mm A' format
+    const formatTime = (timeString) => {
+        const [hour, minute] = timeString.split(':');
+        const hourInt = parseInt(hour);
+        const period = hourInt >= 12 ? 'PM' : 'AM';
+        const formattedHour = ((hourInt + 11) % 12 + 1); // Convert 24h to 12h format
+        return `${formattedHour}:${minute} ${period}`;
     };
 
     return (
@@ -39,10 +56,6 @@ function MarketFormModal({ onClose, onSave }) {
                     <div>
                         <label className="block text-sm font-medium text-gray-600">Close Time:</label>
                         <input type="time" name="closeTime" value={market.closeTime} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-600">Type of Market:</label>
-                        <input type="text" name="type" value={market.type} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
                     </div>
                     <div className="flex items-center mt-4">
                         <label className="text-sm font-medium text-gray-600 mr-2">Is Betting Open:</label>

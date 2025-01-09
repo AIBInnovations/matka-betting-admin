@@ -1,17 +1,31 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate instead of useHistory
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();  // useNavigate instead of useHistory
+  const [loading, setLoading] = useState(false);  // State to manage loading status
+  const navigate = useNavigate();
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
-    // Here you can implement your authentication logic
-    console.log('Credentials:', username, password);
-    // Navigate to dashboard on successful login
-    navigate('/dashboard');  // use navigate() instead of history.push()
+    setLoading(true);  // Set loading to true when login starts
+    try {
+      const response = await axios.post('https://only-backend-je4j.onrender.com/api/admin/login', {
+        email,
+        password
+      });
+      console.log('Login Successful:', response.data);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('userName', response.data.admin.name);
+      setLoading(false);  // Set loading to false when login is successful
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Login Failed:', error.response ? error.response.data : error.message);
+      alert("Login failed: " + (error.response ? error.response.data.message : "Check your network connection."));
+      setLoading(false);  // Ensure to set loading to false if there's an error
+    }
   };
 
   return (
@@ -19,16 +33,17 @@ function Login() {
       <div className="w-full max-w-xs">
         <form onSubmit={handleLogin} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
-              Username
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+              Email
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="username"
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="email"
+              type="email"
+              placeholder="admin@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
             />
           </div>
           <div className="mb-6">
@@ -42,14 +57,16 @@ function Login() {
               placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
           </div>
           <div className="flex items-center justify-between">
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               type="submit"
+              disabled={loading}
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </div>
         </form>

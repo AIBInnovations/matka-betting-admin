@@ -9,31 +9,27 @@ function Users() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Fetch users from the backend
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const token = localStorage.getItem('token'); // Retrieve token from localStorage
-        const { data } = await axios.get('https://only-backend-je4j.onrender.com/api/admin/users', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsersData(data.users);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch users.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Function to fetch users from the backend
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const token = localStorage.getItem('token'); // Retrieve token from localStorage
+      const { data } = await axios.get('https://only-backend-je4j.onrender.com/api/admin/users', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsersData(data.users);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch users.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Fetch users on component mount
+  useEffect(() => {
     fetchUsers();
   }, []);
-
-  // Handle user row click
-  const handleUserClick = (user) => {
-    setSelectedUser(user);
-  };
 
   // Handle modal close
   const handleCloseModal = () => {
@@ -47,26 +43,25 @@ function Users() {
       const token = localStorage.getItem('token');
       if (isAddingUser) {
         // Add new user
-        const { data } = await axios.post(
-          'http://localhost:5000/api/admin/users',
+        await axios.post(
+          'https://only-backend-je4j.onrender.com/api/admin/users',
           user,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setUsersData([...usersData, data.user]);
       } else {
         // Update existing user
-        const { data } = await axios.put(
-          `http://localhost:5000/api/admin/users/${user.id}`,
+        await axios.put(
+          `https://only-backend-je4j.onrender.com/api/admin/users/${user._id}`,
           user,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setUsersData(usersData.map((u) => (u._id === user._id ? data.user : u)));
       }
       handleCloseModal();
+      fetchUsers();  // Refresh users list after a new addition or update
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save user.');
     }
@@ -75,7 +70,6 @@ function Users() {
   return (
     <div className="p-8 bg-gray-50 rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-4 text-gray-800">User Management</h2>
-
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {loading ? (
         <p>Loading users...</p>
@@ -95,7 +89,7 @@ function Users() {
                 <tr
                   key={user._id}
                   className="hover:bg-gray-100 cursor-pointer"
-                  onClick={() => handleUserClick(user)}
+                  onClick={() => setSelectedUser(user)}
                 >
                   <td className="px-6 py-4">{user.name}</td>
                   <td className="px-6 py-4">{user.phoneNumber}</td>
@@ -111,7 +105,7 @@ function Users() {
       <div className="flex justify-end mt-6">
         <button
           onClick={() => setIsAddingUser(true)}
-          className="bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow transform transition-transform hover:scale-105"
+          className="bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow"
         >
           Add User
         </button>

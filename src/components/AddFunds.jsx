@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function AddFunds() {
     const [formData, setFormData] = useState({
@@ -7,16 +8,34 @@ function AddFunds() {
         funds: ''
     });
 
-    const [fundRequests, setFundRequests] = useState([
-        { id: 1, name: "Alice Smith", mobileNumber: "123-456-7890", amount: 100 },
-        { id: 2, name: "Bob Johnson", mobileNumber: "234-567-8901", amount: 200 },
-        { id: 3, name: "Charlie Lee", mobileNumber: "345-678-9012", amount: 150 },
-        { id: 4, name: "Dana Brown", mobileNumber: "456-789-0123", amount: 250 },
-        { id: 5, name: "Emma Davis", mobileNumber: "567-890-1234", amount: 300 },
-        { id: 6, name: "Frank Moore", mobileNumber: "678-901-2345", amount: 400 },
-        { id: 7, name: "Grace Lee", mobileNumber: "789-012-56", amount: 500 },
-        { id: 8, name: "Grace Lee", mobileNumber: "789-012-3456", amount: 500 }
-    ]);
+    const [fundRequests, setFundRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchFundRequests = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setError('Authentication error: No token found');
+                setLoading(false);
+                return;
+            }
+            try {
+                const response = await axios.get('https://only-backend-je4j.onrender.com/api/wallet/transactions', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setFundRequests(response.data); // Assuming the API returns the array directly
+                setLoading(false);
+            } catch (err) {
+                setError(`Error fetching fund requests: ${err.message}`);
+                setLoading(false);
+            }
+        };
+
+        fetchFundRequests();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -44,6 +63,9 @@ function AddFunds() {
     const handleRejectRequest = (id) => {
         setFundRequests(fundRequests.filter(request => request.id !== id));
     };
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>{error}</p>;
 
     return (
         <div className="flex flex-col gap-6 p-6">
@@ -86,6 +108,7 @@ function AddFunds() {
                             <th className="px-6 py-3">Name</th>
                             <th className="px-6 py-3">Mobile Number</th>
                             <th className="px-6 py-3">Amount</th>
+                            <th className="px-6 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
