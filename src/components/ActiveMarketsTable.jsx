@@ -15,7 +15,7 @@ function ActiveMarketsTable({ marketsData, handleToggleBetting, handleCompleteMa
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Market Name</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Open Time</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Close Time</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Market ID</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Betting</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th>
                         <th className="px-4 py-3"></th>
@@ -56,12 +56,6 @@ function ActiveMarketsTable({ marketsData, handleToggleBetting, handleCompleteMa
                                 </div>
                             </td>
                             <td className="px-4 py-3 text-right space-x-2">
-                                <button
-                                    onClick={() => handleCompleteMarket(market.id)}
-                                    className="text-green-500 hover:text-green-700 text-sm"
-                                >
-                                    Complete Market
-                                </button>
                                 <button
                                     onClick={() => handleDeleteMarket(market.id)}
                                     className="text-red-500 hover:text-red-700 text-base p-1"
