@@ -1,10 +1,16 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 function Sidebar({ onMenuClick }) {
     const navigate = useNavigate();
+    const location = useLocation();
+    const email = location.state?.email || "Unknown";
+    const [userEmail, setUserEmail] = useState(email);
+    console.log(email)
 
     const handleLogout = () => {
+        localStorage.removeItem('token'); // Clear token on logout
         navigate('/login'); // Redirect to login page
     };
 
@@ -42,6 +48,15 @@ function Sidebar({ onMenuClick }) {
                 >
                     Games
                 </button>
+                {/* Conditionally Render Admins Option */}
+                {userEmail === 'pranshu@dpmatka.com' && (
+                    <button
+                        onClick={() => onMenuClick('Admins')}
+                        className="block w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
+                    >
+                        Admins
+                    </button>
+                )}
                 <button
                     onClick={handleLogout}
                     className="block w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"

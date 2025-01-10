@@ -7,7 +7,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);  // State to manage loading status
   const navigate = useNavigate();
-
+  
   const handleLogin = async (event) => {
     event.preventDefault();
     setLoading(true);  // Set loading to true when login starts
@@ -20,7 +20,7 @@ function Login() {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userName', response.data.admin.name);
       setLoading(false);  // Set loading to false when login is successful
-      navigate('/dashboard');
+      navigate('/dashboard', { state: { email } });
     } catch (error) {
       console.error('Login Failed:', error.response ? error.response.data : error.message);
       alert("Login failed: " + (error.response ? error.response.data.message : "Check your network connection."));
