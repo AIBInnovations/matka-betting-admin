@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-function UserModal({ user, onClose, onSave }) {
+function UserModal({ user, onClose, onSave, onDelete }) {
     const [editedUser, setEditedUser] = useState({ ...user });
 
     const handleChange = (e) => {
@@ -21,13 +21,13 @@ function UserModal({ user, onClose, onSave }) {
                     name: editedUser.name,
                     phoneNumber: editedUser.phoneNumber,
                     email: editedUser.email,
-                    walletBalance: editedUser.walletBalance
+                    walletBalance: editedUser.walletBalance,
                 },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                        'Content-Type': 'application/json',
+                    },
                 }
             );
             onSave(editedUser);
@@ -36,6 +36,31 @@ function UserModal({ user, onClose, onSave }) {
             alert('Failed to update user.');
         }
         onClose();
+    };
+
+    const handleDelete = async () => {
+        const confirmation = window.confirm(
+            `Are you sure you want to delete user "${editedUser.name}"?`
+        );
+        if (!confirmation) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(
+                `https://only-backend-je4j.onrender.com/api/admin/users/${editedUser._id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            alert('User deleted successfully.');
+            onDelete(editedUser._id);
+            onClose();
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            alert('Failed to delete user.');
+        }
     };
 
     if (!user) return null;
@@ -99,19 +124,27 @@ function UserModal({ user, onClose, onSave }) {
                             </p>
                         </div>
                     </div>
-                    <div className="flex justify-end space-x-3 mt-6">
+                    <div className="flex justify-between items-center space-x-3 mt-6">
                         <button
-                            onClick={onClose}
-                            className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-1 px-3 rounded focus:outline-none"
+                            onClick={handleDelete}
+                            className="bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded focus:outline-none"
                         >
-                            Cancel
+                            Delete
                         </button>
-                        <button
-                            onClick={handleSave}
-                            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded focus:outline-none"
-                        >
-                            Save
-                        </button>
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={onClose}
+                                className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-1 px-3 rounded focus:outline-none"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded focus:outline-none"
+                            >
+                                Save
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>

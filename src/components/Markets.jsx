@@ -9,7 +9,7 @@ function Markets() {
     const [marketsData, setMarketsData] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [loadingAdd, setLoadingAdd] = useState(false); // State to manage loading for adding markets
+    const [loadingAdd, setLoadingAdd] = useState(false);
     const [error, setError] = useState("");
 
     useEffect(() => {
@@ -38,12 +38,23 @@ function Markets() {
         }
     };
 
-    const handleToggleSwitch = async (marketId, isBettingOpen) => {
+    const handleToggleSwitch = async (marketId, currentState) => {
         try {
             const token = localStorage.getItem('token');
+            const marketToUpdate = marketsData.find((market) => market.marketId === marketId);
+            if (!marketToUpdate) {
+                setError("Market not found.");
+                return;
+            }
+
             await axios.put(
-                `https://only-backend-je4j.onrender.com/api/admin/markets/${marketId}/toggle`,
-                { isBettingOpen: !isBettingOpen },
+                `https://only-backend-je4j.onrender.com/api/admin/markets/${marketId}`,
+                {
+                    name: marketToUpdate.name,
+                    openTime: marketToUpdate.openTime,
+                    closeTime: marketToUpdate.closeTime,
+                    isBettingOpen: !currentState,
+                },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -51,9 +62,16 @@ function Markets() {
                     },
                 }
             );
-            fetchMarkets(); // Refresh markets after toggling
+
+            setMarketsData((prevMarkets) =>
+                prevMarkets.map((market) =>
+                    market.marketId === marketId
+                        ? { ...market, isBettingOpen: !currentState }
+                        : market
+                )
+            );
         } catch (error) {
-            setError("Failed to toggle market: " + error.message);
+            setError("Failed to toggle market: " + (error.response?.data?.message || error.message));
         }
     };
 
@@ -79,6 +97,30 @@ function Markets() {
         setLoadingAdd(false);
     };
 
+    const handleDeleteMarket = async (marketId) => {
+        if (!window.confirm("Are you sure you want to delete this market?")) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(
+                `https://only-backend-je4j.onrender.com/api/admin/markets/${marketId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setMarketsData((prevMarkets) =>
+                prevMarkets.filter((market) => market.marketId !== marketId)
+            );
+
+            alert("Market deleted successfully.");
+        } catch (error) {
+            setError("Failed to delete market: " + (error.response?.data?.message || error.message));
+        }
+    };
+
     if (loading) return <p>Loading markets...</p>;
     if (error) return <p>Error loading markets: {error}</p>;
 
@@ -93,16 +135,15 @@ function Markets() {
             <div className="space-y-8">
                 {/* Active Markets Section */}
                 <div>
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-                        Active Markets
-                    </h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-800">Active Markets</h2>
                     <div style={{ maxHeight: '30vh', overflowY: 'auto' }}>
                         <ActiveMarketsTable
                             marketsData={activeMarkets.map((market) => ({
                                 ...market,
                                 result: market.results['Market Result'] || 'No result yet',
                             }))}
-                            onToggleMarket={handleToggleSwitch}
+                            handleToggleBetting={handleToggleSwitch}
+                            handleDeleteMarket={handleDeleteMarket} // Pass delete handler
                         />
                     </div>
                     <div className="mt-4">
@@ -120,9 +161,7 @@ function Markets() {
 
                 {/* Completed Markets Section */}
                 <div>
-                    <h2 className="text-xl font-semibold mb-4 text-gray-800">
-                        Completed Markets
-                    </h2>
+                    <h2 className="text-xl font-semibold mb-4 text-gray-800">Completed Markets</h2>
                     <div style={{ maxHeight: '30vh', overflowY: 'auto' }}>
                         <CompletedMarketsTable
                             marketsData={completedMarkets.map((market) => ({
