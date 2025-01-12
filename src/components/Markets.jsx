@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MarketFormModal from './MarketFormModal';
 import ActiveMarketsTable from './ActiveMarketsTable';
-import CompletedMarketsTable from './CompletedMarketsTable';
 import './ToggleSwitch.css';
 
 function Markets() {
@@ -124,21 +123,18 @@ function Markets() {
     if (loading) return <p>Loading markets...</p>;
     if (error) return <p>Error loading markets: {error}</p>;
 
-    const activeMarkets = marketsData.filter((market) => market.isBettingOpen);
-    const completedMarkets = marketsData.filter((market) => !market.isBettingOpen);
-
     return (
         <div
             className="p-8 bg-white rounded-lg shadow relative overflow-hidden"
             style={{ height: 'calc(100vh - 4rem)' }}
         >
             <div className="space-y-8">
-                {/* Active Markets Section */}
+                {/* Markets Table Section */}
                 <div>
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-800">Active Markets</h2>
-                    <div style={{ maxHeight: '30vh', overflowY: 'auto' }}>
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-800">Markets</h2>
+                    <div style={{ maxHeight: 'calc(100vh - 10rem)', overflowY: 'auto' }}>
                         <ActiveMarketsTable
-                            marketsData={activeMarkets.map((market) => ({
+                            marketsData={marketsData.map((market) => ({
                                 ...market,
                                 result: market.results['Market Result'] || 'No result yet',
                             }))}
@@ -156,19 +152,6 @@ function Markets() {
                         >
                             {loadingAdd ? 'Adding...' : 'Add Market'}
                         </button>
-                    </div>
-                </div>
-
-                {/* Completed Markets Section */}
-                <div>
-                    <h2 className="text-xl font-semibold mb-4 text-gray-800">Completed Markets</h2>
-                    <div style={{ maxHeight: '30vh', overflowY: 'auto' }}>
-                        <CompletedMarketsTable
-                            marketsData={completedMarkets.map((market) => ({
-                                ...market,
-                                result: market.results['Market Result'] || 'No result yet',
-                            }))}
-                        />
                     </div>
                 </div>
             </div>
