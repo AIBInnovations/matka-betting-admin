@@ -138,8 +138,12 @@ function AddFunds() {
                                 key={request._id}
                                 className="bg-white border-b hover:bg-gray-50"
                             >
-                                <td className="px-6 py-4">{request.user.name}</td>
-                                <td className="px-6 py-4">{request.user.email}</td>
+                                <td className="px-6 py-4">
+                                    {request.user?.name || "N/A"}
+                                </td>
+                                <td className="px-6 py-4">
+                                    {request.user?.email || "N/A"}
+                                </td>
                                 <td className="px-6 py-4">${request.amount}</td>
                                 <td
                                     className={`px-6 py-4 font-semibold ${
