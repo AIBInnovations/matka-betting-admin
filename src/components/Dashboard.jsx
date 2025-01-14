@@ -4,16 +4,15 @@ import Users from './Users';
 import Markets from './Markets';
 import AddFunds from './AddFunds';
 import Bets from './Bets';
-import Games from './Games'; // Import the Games component
-import { useLocation } from 'react-router-dom';
+import Games from './Games';
+import GameRates from './GameRates'; // Import the GameRates component
 import Admins from './Admins';
+import { useLocation } from 'react-router-dom';
 
 function Dashboard() {
     const [content, setContent] = useState('Users'); // Default content
     const location = useLocation();
     const email = location.state?.email || "Unknown";
-    // console.log(email)
-    
 
     const handleMenuClick = (menu) => {
         setContent(menu);
@@ -29,8 +28,10 @@ function Dashboard() {
                 return <AddFunds />;
             case 'Bets':
                 return <Bets />;
-            case 'Games': // Render the Games component
+            case 'Games':
                 return <Games />;
+            case 'Game Rates': // Add a new case for Game Rates
+                return <GameRates />;
             case 'Admins':
                 return <Admins />;
             default:

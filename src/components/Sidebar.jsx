@@ -7,7 +7,6 @@ function Sidebar({ onMenuClick }) {
     const location = useLocation();
     const email = location.state?.email || "Unknown";
     const [userEmail, setUserEmail] = useState(email);
-    console.log(email)
 
     const handleLogout = () => {
         localStorage.removeItem('token'); // Clear token on logout
@@ -47,6 +46,12 @@ function Sidebar({ onMenuClick }) {
                     className="block w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
                 >
                     Games
+                </button>
+                <button
+                    onClick={() => onMenuClick('Game Rates')}
+                    className="block w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
+                >
+                    Game Rates
                 </button>
                 {/* Conditionally Render Admins Option */}
                 {userEmail === 'pranshu@dpmatka.com' && (

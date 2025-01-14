@@ -28,14 +28,22 @@ function Markets() {
                     ...market,
                     id: market._id,
                     type: market.marketId,
+                    results: {
+                        openNumber: market.results?.openNumber || '---',
+                        closeNumber: market.results?.closeNumber || '---',
+                        openSingleDigit: market.results?.openSingleDigit || '---',
+                        closeSingleDigit: market.results?.closeSingleDigit || '---',
+                        jodiResult: market.results?.jodiResult || '---',
+                    }
                 }))
             );
             setLoading(false);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || 'Failed to fetch markets');
             setLoading(false);
         }
     };
+    
 
     const handleToggleSwitch = async (marketId, currentState) => {
         try {
@@ -129,17 +137,13 @@ function Markets() {
             style={{ height: 'calc(100vh - 4rem)' }}
         >
             <div className="space-y-8">
-                {/* Markets Table Section */}
                 <div>
                     <h2 className="text-2xl font-semibold mb-4 text-gray-800">Markets</h2>
                     <div style={{ maxHeight: 'calc(100vh - 10rem)', overflowY: 'auto' }}>
                         <ActiveMarketsTable
-                            marketsData={marketsData.map((market) => ({
-                                ...market,
-                                result: market.results['Market Result'] || 'No result yet',
-                            }))}
+                            marketsData={marketsData}
                             handleToggleBetting={handleToggleSwitch}
-                            handleDeleteMarket={handleDeleteMarket} // Pass delete handler
+                            handleDeleteMarket={handleDeleteMarket}
                         />
                     </div>
                     <div className="mt-4">
@@ -156,7 +160,6 @@ function Markets() {
                 </div>
             </div>
 
-            {/* Market Form Modal */}
             {showModal && (
                 <MarketFormModal
                     onClose={() => setShowModal(false)}
