@@ -14,7 +14,7 @@ const Games = () => {
       try {
         const response = await axios.get('https://only-backend-je4j.onrender.com/api/markets');
         setMarkets(response.data);
-        setSelectedMarketId(response.data[0]?._id);
+        setSelectedMarketId(response.data[0]?.marketId);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching markets:', err);
@@ -42,13 +42,13 @@ const Games = () => {
     event.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      console.log(selectedMarket._id);
+      console.log(selectedMarket.marketId);
       console.log(inputOne);
       console.log(inputTwo);
-      const response = await axios.put('https://only-backend-je4j.onrender.com/api/admin/markets/declare-results', {
-        marketId: selectedMarket._id,
-        openNumber: inputOne,
-        closeNumber: inputTwo
+      const response = await axios.post('https://only-backend-je4j.onrender.com/api/admin/markets/declare-results', {
+        marketId: selectedMarket.marketId,
+        openResult: inputOne,
+        closeResult: inputTwo
       }, {
         headers: {
           'Authorization': `Bearer ${token}` // Replace 'YOUR_ACCESS_TOKEN' with your actual access token
@@ -62,7 +62,7 @@ const Games = () => {
     }
   };
 
-  const selectedMarket = markets.find(market => market._id === selectedMarketId);
+  const selectedMarket = markets.find(market => market.marketId === selectedMarketId);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -81,7 +81,7 @@ const Games = () => {
           className="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         >
           {markets.map((market) => (
-            <option key={market._id} value={market._id}>
+            <option key={market.marketId} value={market.marketId}>
               {market.name}
             </option>
           ))}
@@ -128,7 +128,7 @@ const Games = () => {
       {selectedMarket && (
         <div>
           <h2 className="text-lg font-bold">Market Details:</h2>
-          <p><strong>Market ID:</strong> {selectedMarket._id}</p>
+          <p><strong>Market ID:</strong> {selectedMarket.marketId}</p>
           <p><strong>Name:</strong> {selectedMarket.name}</p>
           <p><strong>Open Time:</strong> {selectedMarket.openTime}</p>
           <p><strong>Close Time:</strong> {selectedMarket.closeTime}</p>
