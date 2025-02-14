@@ -43,12 +43,11 @@ function Markets() {
             setLoading(false);
         }
     };
-    
 
     const handleToggleSwitch = async (marketId, currentState) => {
         try {
             const token = localStorage.getItem('token');
-            const marketToUpdate = marketsData.find((market) => market.marketId === marketId);
+            const marketToUpdate = marketsData.find((market) => market.id === marketId);
             if (!marketToUpdate) {
                 setError("Market not found.");
                 return;
@@ -72,7 +71,7 @@ function Markets() {
 
             setMarketsData((prevMarkets) =>
                 prevMarkets.map((market) =>
-                    market.marketId === marketId
+                    market.id === marketId
                         ? { ...market, isBettingOpen: !currentState }
                         : market
                 )
@@ -119,7 +118,7 @@ function Markets() {
             );
 
             setMarketsData((prevMarkets) =>
-                prevMarkets.filter((market) => market.marketId !== marketId)
+                prevMarkets.filter((market) => market.id !== marketId)
             );
 
             alert("Market deleted successfully.");
@@ -137,26 +136,24 @@ function Markets() {
             style={{ height: 'calc(100vh - 4rem)' }}
         >
             <div className="space-y-8">
-                <div>
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-800">Markets</h2>
-                    <div style={{ maxHeight: 'calc(100vh - 10rem)', overflowY: 'auto' }}>
-                        <ActiveMarketsTable
-                            marketsData={marketsData}
-                            handleToggleBetting={handleToggleSwitch}
-                            handleDeleteMarket={handleDeleteMarket}
-                        />
-                    </div>
-                    <div className="mt-4">
-                        <button
-                            onClick={() => setShowModal(true)}
-                            className={`bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded shadow ${
-                                loadingAdd ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
-                            disabled={loadingAdd}
-                        >
-                            {loadingAdd ? 'Adding...' : 'Add Market'}
-                        </button>
-                    </div>
+                <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold text-gray-800">Markets</h2>
+                    <button
+                        onClick={() => setShowModal(true)}
+                        className={`bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded shadow ${
+                            loadingAdd ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                        disabled={loadingAdd}
+                    >
+                        {loadingAdd ? 'Adding...' : 'Add Market'}
+                    </button>
+                </div>
+                <div style={{ maxHeight: 'calc(100vh - 10rem)', overflowY: 'auto' }}>
+                    <ActiveMarketsTable
+                        marketsData={marketsData}
+                        handleToggleBetting={handleToggleSwitch}
+                        handleDeleteMarket={handleDeleteMarket}
+                    />
                 </div>
             </div>
 

@@ -128,7 +128,7 @@ function Bets() {
                                 {activeBets.map((bet) => (
                                     <tr key={bet._id} className="hover:bg-gray-50 transition duration-200">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {bet.user.name}
+                                            {bet.user ? bet.user.name : "No User"}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                             {bet.marketName}
@@ -158,6 +158,8 @@ function Bets() {
                                             >
                                                 <i className="fas fa-trash"></i>
                                             </button>
+                                            {/* <i className="fas fa-trash"></i> */}
+                                            
                                         </td>
                                     </tr>
                                 ))}
@@ -205,7 +207,7 @@ function Bets() {
                                     return (
                                         <tr key={bet._id} className="hover:bg-gray-50 transition duration-200">
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                {bet.user.name}
+                                                {bet.user ? bet.user.name : "No User"}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                                 {bet.marketName}
@@ -219,13 +221,11 @@ function Bets() {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                                 {winningAmount > 0 ? `$${winningAmount.toFixed(2)}` : "-"}
                                             </td>
-                                            <td
-                                                className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${
-                                                    bet.status.toLowerCase() === "won"
-                                                        ? "text-green-500"
-                                                        : "text-red-500"
-                                                }`}
-                                            >
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${
+                                                bet.status.toLowerCase() === "won"
+                                                    ? "text-green-500"
+                                                    : "text-red-500"
+                                            }`}>
                                                 {bet.status}
                                             </td>
                                         </tr>
