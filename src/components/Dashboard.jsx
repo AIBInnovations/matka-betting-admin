@@ -12,7 +12,7 @@ import { useLocation } from 'react-router-dom';
 function Dashboard() {
     const [content, setContent] = useState('Users'); // Default content
     const location = useLocation();
-    const email = location.state?.email || "Unknown";
+    const email = location.state?.email || "Unknown"; // Handling email from route state
 
     const handleMenuClick = (menu) => {
         setContent(menu);
@@ -30,19 +30,19 @@ function Dashboard() {
                 return <Bets />;
             case 'Games':
                 return <Games />;
-            case 'Game Rates': // Add a new case for Game Rates
+            case 'Game Rates':
                 return <GameRates />;
             case 'Admins':
                 return <Admins />;
             default:
-                return <Users />;
+                return <Users />; // Default to Users if the case is not matched
         }
     };
 
     return (
         <div className="flex h-screen bg-gray-100">
             <Sidebar onMenuClick={handleMenuClick} />
-            <div className="flex-1 p-10">
+            <div className="flex-1 p-10 overflow-auto"> {/* Ensuring content area is scrollable */}
                 {renderContent()}
             </div>
         </div>
