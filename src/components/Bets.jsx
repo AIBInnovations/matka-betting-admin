@@ -39,24 +39,37 @@ function Bets() {
         }
     };
 
-    const handleEditBet = async (updatedBet) => {
+    const handleEditBet = async (response) => {
+        console.log("Received response for update:", response);
+        const updatedBet = response.bet;
+    
+        if (!updatedBet || !updatedBet._id) {
+            console.error("No ID found or incorrect bet data:", updatedBet);
+            alert("Error: No bet ID provided or incorrect bet data.");
+            return;
+        }
+    
         try {
             const token = localStorage.getItem("token");
             await axios.put(
                 `https://only-backend-je4j.onrender.com/api/admin/bets/${updatedBet._id}`,
-                { number: updatedBet.number },
+                updatedBet,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 }
             );
+            console.log("Update successful for bet ID:", updatedBet._id);
             fetchBets();
             setIsModalOpen(false);
         } catch (error) {
+            console.error("Failed to update bet:", error);
             alert("Failed to update bet. Please try again.");
         }
     };
+    
+    
 
     const handleDeleteBet = async (betId) => {
         if (!window.confirm("Are you sure you want to delete this bet?")) return;
