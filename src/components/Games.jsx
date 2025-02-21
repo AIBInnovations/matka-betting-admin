@@ -42,27 +42,31 @@ const Games = () => {
     event.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      console.log(selectedMarket.marketId);
-      console.log(inputOne);
-      console.log(inputTwo);
-      const response = await axios.post('https://only-backend-je4j.onrender.com/api/admin/markets/declare-results', {
-        marketId: selectedMarket.marketId,
-        openResult: inputOne,
-        closeResult: inputTwo
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}` // Replace 'YOUR_ACCESS_TOKEN' with your actual access token
+
+      const response = await axios.post(
+        'https://only-backend-je4j.onrender.com/api/admin/markets/declare-results',
+        {
+          marketId: selectedMarket.marketId,
+          openResult: inputOne,
+          closeResult: inputTwo,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
+
       console.log('Submit success:', response.data);
-      // Additional success logic here
+      window.alert('✅ Game results updated successfully!'); // Success alert
+      
     } catch (err) {
       console.error('Error submitting:', err);
-      // Handle errors here
+      window.alert('❌ Failed to update game results. Please try again!'); // Error alert
     }
   };
 
-  const selectedMarket = markets.find(market => market.marketId === selectedMarketId);
+  const selectedMarket = markets.find((market) => market.marketId === selectedMarketId);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -135,9 +139,12 @@ const Games = () => {
           <p><strong>Betting Status:</strong> {selectedMarket.isBettingOpen ? 'Open' : 'Closed'}</p>
           <h3 className="text-lg font-bold mt-2">Results:</h3>
           <ul>
-            {selectedMarket.results && Object.entries(selectedMarket.results).map(([key, value]) => (
-              <li key={key}><strong>{key.replace(/([A-Z])/g, ' $1').trim()}:</strong> {value}</li>
-            ))}
+            {selectedMarket.results &&
+              Object.entries(selectedMarket.results).map(([key, value]) => (
+                <li key={key}>
+                  <strong>{key.replace(/([A-Z])/g, ' $1').trim()}:</strong> {value}
+                </li>
+              ))}
           </ul>
         </div>
       )}
