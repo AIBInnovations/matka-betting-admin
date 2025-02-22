@@ -51,7 +51,7 @@ function UserModal({ user, onClose, onSave, onDelete, isNewUser }) {
                 );
                 alert("✅ User added successfully!");
                 console.log("✅ API Response:", response.data);
-                onSave(response.data.user);
+                // onSave(response.data.user);
             } else {
                 // 🔥 Only send non-empty fields when updating a user
                 const updateData = {};

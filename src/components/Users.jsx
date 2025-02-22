@@ -138,7 +138,7 @@ function Users() {
         user={isAddingUser ? null : selectedUser}  // Pass `null` for new user
         isNewUser={isAddingUser}  // Pass `true` if adding new user
         onClose={handleCloseModal}
-        onSave={handleSaveUser}
+        // onSave={handleSaveUser}
     />
     )}
 
