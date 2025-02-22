@@ -76,7 +76,7 @@ function Markets() {
             setMarketsData((prevMarkets) =>
                 prevMarkets.map((market) =>
                     market.marketId === marketId
-                        ? { ...market, isBettingOpen: !currentState }
+                        ? { ...market, isBettingOpen: !currentState, openBetting: !currentState }
                         : market
                 )
             );
