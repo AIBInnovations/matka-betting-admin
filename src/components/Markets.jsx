@@ -63,6 +63,7 @@ function Markets() {
                     openTime: marketToUpdate.openTime,
                     closeTime: marketToUpdate.closeTime,
                     isBettingOpen: !currentState,
+                    openBetting : !currentState
                 },
                 {
                     headers: {
