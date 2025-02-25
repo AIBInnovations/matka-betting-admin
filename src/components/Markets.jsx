@@ -46,25 +46,21 @@ function Markets() {
     };
 
     const handleToggleSwitch = async (marketId, currentState) => {
+        console.log("Toggle request for market ID:", marketId);
         try {
             const token = localStorage.getItem('token');
-            
             const marketToUpdate = marketsData.find((market) => market.marketId === marketId);
             if (!marketToUpdate) {
-                console.error("Market with ID not found:", marketId); // Log if market is not found
+                console.error("Market with ID not found:", marketId);
                 setError("Market not found.");
                 return;
             }
     
-            console.log("Updating market:", marketToUpdate); // Log the market data being updated
+            console.log("Updating market:", marketToUpdate);
             await axios.put(
                 `https://only-backend-je4j.onrender.com/api/admin/markets/${marketId}`,
                 {
-                    name: marketToUpdate.name,
-                    openTime: marketToUpdate.openTime,
-                    closeTime: marketToUpdate.closeTime,
-                    isBettingOpen: !currentState,
-                    openBetting : !currentState
+                    isBettingOpen: !currentState // ✅ Only send isBettingOpen (openBetting updates automatically)
                 },
                 {
                     headers: {
@@ -74,6 +70,7 @@ function Markets() {
                 }
             );
     
+            // ✅ Update state immediately to reflect changes
             setMarketsData((prevMarkets) =>
                 prevMarkets.map((market) =>
                     market.marketId === marketId
@@ -86,8 +83,6 @@ function Markets() {
             setError("Failed to toggle market: " + (error.response?.data?.message || error.message));
         }
     };
-    
-    
 
     const handleAddMarket = async (newMarket) => {
         setLoadingAdd(true);
