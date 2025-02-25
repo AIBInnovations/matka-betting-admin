@@ -18,6 +18,7 @@ function Markets() {
     const fetchMarkets = async () => {
         try {
             const token = localStorage.getItem('token');
+            console.log(token);
             const response = await axios.get('https://only-backend-je4j.onrender.com/api/markets', {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -47,6 +48,7 @@ function Markets() {
     const handleToggleSwitch = async (marketId, currentState) => {
         try {
             const token = localStorage.getItem('token');
+            
             const marketToUpdate = marketsData.find((market) => market.marketId === marketId);
             if (!marketToUpdate) {
                 console.error("Market with ID not found:", marketId); // Log if market is not found

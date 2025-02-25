@@ -53,6 +53,12 @@ function Sidebar({ onMenuClick }) {
                 >
                     Game Rates
                 </button>
+                <button
+                    onClick={() => onMenuClick('Platform Settings')}
+                    className="block w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
+                >
+                    Platform Settings
+                </button>
                 {/* Conditionally Render Admins Option */}
                 {userEmail === 'pranshu@dpmatka.com' && (
                     <button

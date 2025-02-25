@@ -7,6 +7,7 @@ import Bets from './Bets';
 import Games from './Games';
 import GameRates from './GameRates'; // Import the GameRates component
 import Admins from './Admins';
+import PlatformSettings from './PlatformSettings';
 import { useLocation } from 'react-router-dom';
 
 function Dashboard() {
@@ -32,6 +33,8 @@ function Dashboard() {
                 return <Games />;
             case 'Game Rates':
                 return <GameRates />;
+            case 'Platform Settings':
+                return <PlatformSettings />;
             case 'Admins':
                 return <Admins />;
             default:
